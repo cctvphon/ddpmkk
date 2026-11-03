@@ -38,8 +38,8 @@ if(route?.path==='auth/register'){
  const label=el('label','หน่วยงาน');label.htmlFor='unit';const select=el('select');select.id='unit';select.required=true;
  for(const value of ['','สำนักงาน ปภ.จังหวัดขอนแก่น','สนง.ปภ.ขอนแก่น สาขาพล','สนง.ปภ.ขอนแก่น สาขาชุมแพ']){const o=el('option',value||'เลือกหน่วยงาน');o.value=value;select.append(o);}form.append(label,select);
  form.append(el('p','การเลือกหน่วยงานเป็นข้อมูลประกอบการสมัคร ต้องได้รับการตรวจสอบก่อนให้สิทธิ์ใช้งาน','muted'));
- const submit=el('button','ยังไม่เปิดรับลงทะเบียน');submit.type='submit';submit.disabled=true;form.append(submit);
- form.addEventListener('submit',e=>e.preventDefault());box.append(form);
+ const submit=el('button','เข้าสู่ระบบ LINE ก่อนส่งสมัคร');submit.type='submit';submit.disabled=true;form.append(submit);
+ form.addEventListener('submit',async e=>{e.preventDefault();if(!config.backendUrl||!window.liff||!liff.isLoggedIn()){identity.textContent='กรุณาเข้าสู่ระบบ LINE ก่อนส่งสมัคร';return;}submit.disabled=true;submit.textContent='กำลังส่งข้อมูล…';try{const idToken=liff.getIDToken();if(!idToken)throw Error('ไม่พบ LIFF ID token');const response=await fetch(config.backendUrl,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'register',idToken,fullName:form.elements.fullName.value,position:form.elements.position.value,phone:form.elements.phone.value,unitId:form.elements.unit.value,areaId:'KHONKAEN'})});const result=await response.json();if(!result.ok)throw Error(result.error||'ส่งข้อมูลไม่สำเร็จ');identity.textContent='ส่งใบสมัครแล้ว • สถานะรออนุมัติ';submit.textContent='ส่งใบสมัครแล้ว';}catch(error){identity.textContent=`ส่งใบสมัครไม่สำเร็จ: ${error.message}`;submit.disabled=false;submit.textContent='ลองส่งอีกครั้ง';}});box.append(form);
 }else if(route?.path==='auth/status'){
  card('ผลการตรวจสอบสมาชิก').append(el('p','ยังตรวจสถานะการอนุมัติไม่ได้ เนื่องจากบริการสมาชิกยังไม่เชื่อมต่อ ไม่ถือว่าเป็นสถานะรออนุมัติหรือได้รับอนุมัติแล้ว','notice'));
 }else if(route?.path==='central/overview-launcher'){
@@ -58,7 +58,8 @@ async function init(){
    identity.textContent='ยังไม่ได้เข้าสู่ระบบด้วยบัญชี LINE';
    const b=el('button','เข้าสู่ระบบด้วย LINE');b.onclick=()=>liff.login({redirectUri:location.href});status.append(b);return;
   }
-  identity.textContent='เข้าสู่ระบบ LINE แล้ว • ยังไม่ได้ตรวจสมาชิกและสิทธิ์กับ Backend';
+  identity.textContent='เข้าสู่ระบบ LINE แล้ว • กรอกข้อมูลเพื่อส่งใบสมัคร';
+  if(route.path==='auth/register'){submit.disabled=false;submit.textContent='ส่งใบสมัครเจ้าหน้าที่';}
   // Never treat browser profile/decoded claims as authorization. The future API must verify the ID token.
  }catch(error){identity.textContent='เปิด LIFF ไม่สำเร็จ กรุณาตรวจ LIFF ID, Endpoint และสิทธิ์บัญชีทดสอบ';console.warn('LIFF initialization failed',error?.code||'UNKNOWN');}
 }
