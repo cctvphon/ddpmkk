@@ -2,6 +2,7 @@
 export const config = {
   channelId: '2012348639',
   baseUrl: 'https://cctvphon.github.io/ddpmkk/',
+  // Paste the deployed Apps Script /exec URL here after deployment. Leave blank to keep submit disabled.
   backendUrl: 'https://script.google.com/macros/s/AKfycbwhEk1P0EutunTuH40DNpW808-OPCUiLWQwcDRjute0ELsmhyL51RbYaj2GkRjyK0fszg/exec',
   // Transcribed from the supplied console screenshots; verify in the console before rollout.
   routes: [

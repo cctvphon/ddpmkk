@@ -61,6 +61,6 @@ async function init(){
   identity.textContent='เข้าสู่ระบบ LINE แล้ว • กรอกข้อมูลเพื่อส่งใบสมัคร';
   if(route.path==='auth/register'){submit.disabled=false;submit.textContent='ส่งใบสมัครเจ้าหน้าที่';}
   // Never treat browser profile/decoded claims as authorization. The future API must verify the ID token.
- }catch(error){identity.textContent='เปิด LIFF ไม่สำเร็จ กรุณาตรวจ LIFF ID, Endpoint และสิทธิ์บัญชีทดสอบ';console.warn('LIFF initialization failed',error?.code||'UNKNOWN');}
+ }catch(error){identity.textContent=`เปิด LIFF ไม่สำเร็จ: ${error?.code||'UNKNOWN'}${error?.message?' — '+error.message:''}`;console.warn('LIFF initialization failed',error?.code||'UNKNOWN',error?.message||'');}
 }
 init();
